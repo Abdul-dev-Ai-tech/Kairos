@@ -1,0 +1,57 @@
+{% load static store_tags %}<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}KAIROS STORE — Every Second, Your Style.{% endblock %}</title>
+  <meta name="description" content="{% block description %}Discover a considered collection of men's, women's and unisex watches at KAIROS STORE. Find the timepiece that feels like you.{% endblock %}">
+  <meta name="theme-color" content="#181a18"><link rel="canonical" href="{{ canonical_url }}">
+  {% block robots %}{% endblock %}
+  <link rel="icon" href="{% if store.favicon %}{{ store.favicon.url }}{% elif store.logo %}{{ store.logo.url }}{% else %}{% static 'images/favicon.svg' %}{% endif %}">
+  <link rel="preload" href="{% static 'fonts/manrope-latin-400-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="preload" href="{% static 'fonts/cormorant-garamond-latin-500-normal.woff2' %}" as="font" type="font/woff2" crossorigin>
+  <link rel="stylesheet" href="{% static 'css/tailwind.css' %}"><link rel="stylesheet" href="{% static 'css/store.css' %}"><link rel="stylesheet" href="{% static 'css/luxury.css' %}">
+  <script defer src="{% static 'js/store.js' %}"></script>
+  {% block head %}{% endblock %}
+</head>
+<body class="{% block bodyclass %}{% endblock %}">
+{% include 'core/icons.html' %}
+<a class="skip-link" href="#main">Skip to content</a>
+<div class="announcement"><span>{{ store.announcement }}</span><span class="announcement-detail">LAHORE · PKR</span></div>
+<header class="site-header" id="site-header">
+  <div class="header-inner">
+    <button class="icon-button mobile-menu-toggle" type="button" aria-label="Open navigation" aria-controls="main-nav" aria-expanded="false"><svg><use href="#i-menu"/></svg></button>
+    <a href="{% url 'home' %}" class="brand" aria-label="KAIROS STORE home">{% include 'core/logo.html' %}</a>
+    <nav id="main-nav" aria-label="Main navigation">
+      <a href="{% url 'catalog:shop' %}">All watches</a>
+      {% for collection in nav_collections %}<a href="{{ collection.get_absolute_url }}">{{ collection.name }}</a>{% endfor %}
+      <a href="{% url 'catalog:new' %}">New arrivals<span class="nav-dot"></span></a>
+    </nav>
+    <div class="header-actions">
+      <button type="button" class="icon-button" data-open-search aria-label="Search watches"><svg><use href="#i-search"/></svg></button>
+      <a class="icon-button account-link" href="{% url 'accounts:profile' %}" aria-label="Your account"><svg><use href="#i-user"/></svg></a>
+      <a class="icon-button wishlist-link" href="{% url 'catalog:wishlist' %}" aria-label="Your wishlist"><svg><use href="#i-heart"/></svg></a>
+      <a class="icon-button bag-link" href="{% url 'orders:cart' %}" data-open-cart aria-label="Open shopping bag"><svg><use href="#i-bag"/></svg><span data-cart-count>{{ cart_count }}</span></a>
+    </div>
+  </div>
+</header>
+<div class="messages" role="status" aria-live="polite">{% for message in messages %}<div class="message {{ message.tags }}">{{ message }}<button type="button" aria-label="Dismiss message" data-dismiss>×</button></div>{% endfor %}</div>
+<main id="main">{% block content %}{% endblock %}</main>
+<section class="service-strip" aria-label="Our approach">
+  <div><svg><use href="#i-truck"/></svg><span><strong>Delivered to your door</strong><small>Delivery within Lahore only</small></span></div>
+  <div><svg><use href="#i-shield"/></svg><span><strong>A considered choice</strong><small>Clear product details, no guesswork</small></span></div>
+  <div><svg><use href="#i-refresh"/></svg><span><strong>Here to help</strong><small>Personal support from our store</small></span></div>
+</section>
+<footer class="site-footer">
+  <div class="footer-top wrap"><div class="footer-brand"><a class="brand" href="{% url 'home' %}">{% include 'core/logo.html' %}</a><p>{{ store.tagline }}</p><p class="footer-description">For the moments that become your story.<br>A watch for every version of you.</p>{% if store.whatsapp %}<a href="https://wa.me/{{ store.whatsapp }}" target="_blank" rel="noopener noreferrer">WhatsApp ↗</a>{% endif %}{% if store.instagram %}<a href="{{ store.instagram }}" target="_blank" rel="noopener noreferrer">Instagram ↗</a>{% endif %} {% if store.facebook %}<a href="{{ store.facebook }}" target="_blank" rel="noopener noreferrer">Facebook ↗</a>{% endif %}</div>
+    <div><h2>Explore</h2><a href="{% url 'catalog:shop' %}">All watches</a>{% for collection in nav_collections %}<a href="{{ collection.get_absolute_url }}">{{ collection.name }}</a>{% endfor %}<a href="{% url 'catalog:featured' %}">Featured edit</a></div>
+    <div><h2>Client care</h2><a href="{% url 'contact' %}">Contact us</a><a href="{% url 'page' 'faqs' %}">FAQs</a><a href="{% url 'page' 'shipping' %}">Shipping & delivery</a><a href="{% url 'page' 'returns' %}">Returns</a><a href="{% url 'orders:history' %}">Your orders</a></div>
+    <div><h2>The store</h2><a href="{% url 'page' 'about' %}">Our story</a><a href="{% url 'page' 'privacy' %}">Privacy policy</a>{% if store.email %}<a href="mailto:{{ store.email }}">{{ store.email }}</a>{% endif %}{% if store.phone %}<p>{{ store.phone }}</p>{% endif %}{% if store.address %}<p>{{ store.address|linebreaksbr }}</p>{% endif %}</div>
+  </div>
+  <div class="footer-bottom wrap"><span>© {% now 'Y' %} {{ store.name }}.</span><span>TIME, WELL CHOSEN.</span><span>Prices in PKR</span></div>
+</footer>
+{% if store.whatsapp %}<a class="whatsapp" href="https://wa.me/{{ store.whatsapp }}?text=Hello%20KAIROS%20STORE%2C%20I%20have%20a%20watch%20enquiry." target="_blank" rel="noopener noreferrer" aria-label="Enquire on WhatsApp"><span aria-hidden="true">↗</span> <span>Let's talk</span></a>{% endif %}
+<dialog id="search-dialog" class="search-dialog"><div class="dialog-top"><span class="eyebrow">FIND YOUR NEXT TIMEPIECE</span><button type="button" class="icon-button" data-close-dialog aria-label="Close search"><svg><use href="#i-close"/></svg></button></div><form action="{% url 'catalog:search' %}" method="get"><label for="global-search">What speaks to your style?</label><div class="search-input"><input type="search" id="global-search" name="q" placeholder="A style, a collection, a watch…" maxlength="120" required><button class="icon-button" aria-label="Search"><svg><use href="#i-arrow"/></svg></button></div></form><p>Explore our <a href="{% url 'catalog:shop' %}">complete collection</a>.</p></dialog>
+<dialog id="cart-dialog" class="cart-dialog" aria-labelledby="cart-drawer-title"><div class="dialog-top"><h2 id="cart-drawer-title">Your bag <span data-cart-count>{{ cart_count }}</span></h2><button class="icon-button" data-close-dialog type="button" aria-label="Close shopping bag"><svg><use href="#i-close"/></svg></button></div><div data-cart-body></div></dialog>
+<div class="toast" role="status" aria-live="polite" hidden></div>
+{% block scripts %}{% endblock %}
+</body></html>

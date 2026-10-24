@@ -1,0 +1,27 @@
+NEW KAIROS STORE ORDER: {{ order.number }}
+
+Customer: {{ order.name }}
+Phone / WhatsApp: +{{ order.phone }}
+Email: {{ order.email }}
+
+DELIVER WITHIN LAHORE
+Address: {{ order.address }}
+Area: {{ order.area }}
+Landmark: {{ order.landmark|default:'Not supplied' }}
+City: {{ order.city }} {{ order.postal_code }}
+Map / pin: {{ order.delivery_map_url|default:'Not supplied' }}
+Delivery estimate: {{ order.delivery_estimate }}
+
+{% for item in order.items.all %}{{ item.quantity }} x {{ item.product_name }} / {{ item.variant_name }} / {{ item.sku }}
+Unit: PKR {{ item.unit_price }} | Line: PKR {{ item.line_total }}
+{% endfor %}
+Subtotal: PKR {{ order.subtotal }}
+Discount: PKR {{ order.discount }}
+Shipping: PKR {{ order.shipping }}
+TOTAL: PKR {{ order.total }}
+Payment method: {{ order.payment_method }}
+Payment: {{ order.get_payment_status_display }}
+Notes: {{ order.notes|default:'None' }}
+
+Review full order (staff sign-in + OTP required): {{ staff_url }}
+Verify address, stock/fulfilment and payment status before dispatch.

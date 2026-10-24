@@ -1,0 +1,13 @@
+{% load static %}
+<aside id="kairos-sidebar" class="km-sidebar" aria-label="Store administration">
+  <div class="km-sidebar-head">
+    <a class="km-brand" href="{% url 'admin:index' %}">{% if store.logo %}<img src="{{ store.logo.url }}" alt="{{ store.name }}" width="174" height="58">{% else %}<span class="km-brand-monogram">K</span><span class="km-brand-wordmark">KAIROS<small>STORE MANAGER</small></span>{% endif %}</a>
+    <button class="km-sidebar-close km-icon-button" type="button" aria-label="Close navigation">{% include 'admin/components/icon.html' with name='close' %}</button>
+  </div>
+  <div class="km-workspace-card"><span class="km-live-dot" aria-hidden="true"></span><span>{{ store.name }}<small>Lahore, Pakistan <span aria-hidden="true">·</span> PKR</small></span>{% include 'admin/components/icon.html' with name='store' %}</div>
+  <nav class="km-navigation" aria-label="Admin navigation">
+    <a class="km-nav-link km-overview-link{% if admin_overview_active %} is-active{% endif %}" href="{% url 'admin:index' %}"{% if admin_overview_active %} aria-current="page"{% endif %}>{% include 'admin/components/icon.html' with name='overview' %}<span>Overview</span></a>
+    {% for section in admin_navigation %}<div class="km-nav-section"><p class="km-nav-heading">{{ section.name }}</p>{% for link in section.links %}<a class="km-nav-link{% if link.active %} is-active{% endif %}" href="{{ link.url }}"{% if link.active %} aria-current="page"{% endif %}>{% include 'admin/components/icon.html' with name=link.icon %}<span>{{ link.name }}</span>{% if link.active %}<span class="km-active-dot" aria-hidden="true"></span>{% endif %}</a>{% endfor %}</div>{% endfor %}
+  </nav>
+  <div class="km-sidebar-account"><div class="km-account-avatar">{{ user.get_username|first|upper }}</div><div class="km-account-name"><strong>{% firstof user.get_short_name user.get_username %}</strong><span>{% if user.is_superuser %}Store owner{% else %}Staff workspace{% endif %}</span></div><form action="{% url 'admin:logout' %}" method="post">{% csrf_token %}<button type="submit" class="km-icon-button" aria-label="Sign out">{% include 'admin/components/icon.html' with name='logout' %}</button></form></div>
+</aside>

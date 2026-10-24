@@ -1,0 +1,4 @@
+KAIROS STORE demonstration website.
+Fonts: Manrope and Cormorant Garamond, SIL Open Font License; notices in /static/fonts/.
+Watch photographs: conceptual images generated for this project. These do not represent verified real inventory, warranties, authenticity or named watch brands.
+Original storefront code and graphics: KAIROS STORE project, MIT-licensed source delivered separately.

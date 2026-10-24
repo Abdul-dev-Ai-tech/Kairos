@@ -1,0 +1,33 @@
+# Place behind an existing TLS terminator, or add your certificate configuration
+# to this server. Replace example.com and both filesystem paths.
+server {
+    listen 443 ssl;
+    server_name example.com;
+    ssl_certificate /etc/letsencrypt/live/example.com/fullchain.pem;
+    ssl_certificate_key /etc/letsencrypt/live/example.com/privkey.pem;
+    client_max_body_size 25m;
+    location /static/ {
+        alias /srv/kairos/staticfiles/;
+        expires 30d;
+        add_header X-Content-Type-Options nosniff always;
+    }
+    location /media/ {
+        alias /srv/kairos/media/;
+        # Uploaded files are re-encoded images; never execute scripts here.
+        add_header X-Content-Type-Options nosniff always;
+        add_header Content-Security-Policy "default-src 'none'; img-src 'self'; sandbox" always;
+    }
+    location / {
+        proxy_pass http://127.0.0.1:8000;
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-Proto $scheme;
+        # Single trusted proxy: overwrite client-supplied forwarding headers.
+        proxy_set_header X-Forwarded-For $remote_addr;
+    }
+}
+server {
+    listen 80;
+    server_name example.com;
+    return 301 https://$host$request_uri;
+}

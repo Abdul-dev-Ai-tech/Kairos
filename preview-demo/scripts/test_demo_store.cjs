@@ -1,0 +1,14 @@
+const fs=require('node:fs'),vm=require('node:vm'),assert=require('node:assert/strict');
+const values=new Map();const window={dispatchEvent(){}};
+const context={window,localStorage:{getItem:k=>values.get(k)||null,setItem:(k,v)=>values.set(k,v)},CustomEvent:class {},URL,Date,JSON,Error,Set,Number,String,Array};
+vm.createContext(context);vm.runInContext(fs.readFileSync('dist/static/js/demo-catalog.js','utf8'),context);vm.runInContext(fs.readFileSync('dist/static/js/demo-store.js','utf8'),context);
+const S=window.KairosStore;assert.equal(S.products.length,12);
+let p=S.clone(S.products[0]);p.name='Test watch';p.id=1000;p.sku='TEST-1';p.url='/product/?id=1000';p.variants.forEach((v,i)=>{v.id=10000+i;v.sku='TEST-1-'+i;v.stock=2;});S.saveProduct(p);assert.equal(S.products.length,13);assert.equal(S.products.find(x=>x.id===1000).stock,4);
+p=S.clone(S.state.products.find(p=>p.id===1000));p.price='5000';p.regularPrice='6000';p.collection='men';p.variants[0].price='5000';S.saveProduct(p);assert.equal(S.products.find(x=>x.id===1000).collectionName,'Men’s Watches');assert.equal(S.products.find(x=>x.id===1000).price,'5000');
+p.variants[0].stock=-1;assert.throws(()=>S.saveProduct(p));p.variants[0].stock=2;p.status='draft';S.saveProduct(p);assert(!S.products.some(p=>p.id===1000));
+S.saveCategory({id:'test-cat',name:'Accessories',description:'Test',image:''});assert(S.state.categories.some(x=>x.id==='test-cat'));S.deleteCategory('test-cat','men');
+assert.throws(()=>S.deleteCategory('women','missing'));S.saveCategory({id:'newcat',name:'Test category',description:'',image:''});S.deleteCategory('women','newcat');assert(S.state.products.filter(p=>p.collection==='newcat').length===4);
+assert.throws(()=>S.saveSettings({...S.state.settings,whatsapp:'hello'}));assert.throws(()=>S.saveSettings({...S.state.settings,instagram:'https://evil.invalid/a'}));S.saveSettings({...S.state.settings,instagram:'@demo_handle',whatsapp:'+92 300 1234567'});assert.equal(S.state.settings.whatsapp,'923001234567');assert.equal(S.state.settings.instagram,'https://www.instagram.com/demo_handle/');
+S.addOrder({number:'DEMO-1',total:123400,status:'Pending'});S.updateOrder('DEMO-1','Delivered');assert.equal(S.state.orders[0].status,'Delivered');assert.throws(()=>S.updateOrder('DEMO-1','invalid'));
+S.deleteProduct(1000);assert(!S.state.products.some(p=>p.id===1000));S.reset();assert.equal(S.products.length,12);assert.equal(S.state.categories.length,3);assert.equal(S.state.orders.length,0);
+console.log('PASS: demo product CRUD, category CRUD/reassignment, publishing, validation, social settings, sample orders and reset.');

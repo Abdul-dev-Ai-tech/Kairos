@@ -1,0 +1,11 @@
+{% load store_tags static %}<article class="product-card reveal">
+  <div class="product-visual">
+    <a href="{{ product.get_absolute_url }}" class="product-image" aria-label="View {{ product.name }}">
+      {% if product.cover %}<img src="{{ product.cover.thumbnail.url }}" srcset="{{ product.cover.thumbnail.url }} 480w, {{ product.cover.medium.url }} 960w" sizes="(max-width: 600px) 45vw, (max-width: 1000px) 43vw, 25vw" width="640" height="800" alt="{{ product.cover.alt }}" loading="lazy">{% else %}<img src="{% static 'images/product-placeholder.svg' %}" width="640" height="800" alt="Product photograph to be added" loading="lazy">{% endif %}
+    </a>
+    <div class="product-badges">{% if not product.stock %}<span>Out of stock</span>{% elif product.on_sale %}<span class="sale">The special edit</span>{% elif product.new_arrival %}<span>New arrival</span>{% endif %}</div>
+    <form method="post" action="{% url 'catalog:wishlist_toggle' product.pk %}" data-wishlist>{% csrf_token %}<input type="hidden" name="next" value="{{ request.get_full_path }}"><button class="icon-button wishlist-button {% if product|saved:wishlist_ids %}is-saved{% endif %}" type="submit" aria-label="Save {{ product.name }} to wishlist" aria-pressed="{% if product|saved:wishlist_ids %}true{% else %}false{% endif %}"><svg><use href="#i-heart"/></svg></button></form>
+    <a href="{{ product.get_absolute_url }}" class="product-discover">Discover timepiece <svg><use href="#i-arrow"/></svg></a>
+  </div>
+  <div class="product-info"><div class="product-category">{{ product.collection.name }}{% if product.is_demo %} · Demo{% endif %}</div><a href="{{ product.get_absolute_url }}"><h3>{{ product.name }}</h3></a><p class="product-price">{{ product.price|money }} {% if product.price < product.regular_price %}<del>{{ product.regular_price|money }}</del>{% endif %}</p>{% if product.active_variants|length > 1 %}<span class="variant-count">{{ product.active_variants|length }} finishes to explore</span>{% endif %}</div>
+</article>

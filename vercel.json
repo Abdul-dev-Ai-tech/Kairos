@@ -1,0 +1,10 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "functions": {
+    "config/wsgi.py": {
+      "maxDuration": 120,
+      "excludeFiles": "{.venv/**,node_modules/**,preview-demo/**,tests/**,docs/**,.test-media/**,media/**,*.sqlite3}"
+    }
+  },
+  "crons": [{"path": "/internal/notifications/run/", "schedule": "*/5 * * * *"}]
+}

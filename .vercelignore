@@ -1,0 +1,14 @@
+.env
+.env.*
+!.env.example
+.venv/
+node_modules/
+.git/
+.test-media/
+media/
+pgdata/
+preview-demo/
+*.zip
+*.sqlite3
+__pycache__/
+*.pyc

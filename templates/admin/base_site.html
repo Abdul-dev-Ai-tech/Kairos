@@ -1,0 +1,27 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block title %}{{ title }} | KAIROS Store Manager{% endblock %}
+{% block dark-mode-vars %}{% endblock %}
+{% block extrastyle %}{{ block.super }}<link rel="icon" href="{% if store.favicon %}{{ store.favicon.url }}{% elif store.logo %}{{ store.logo.url }}{% else %}{% static 'images/favicon.svg' %}{% endif %}">{% endblock %}
+{% block responsive %}{{ block.super }}
+<link rel="stylesheet" href="{% static 'css/admin.css' %}?v=20261024b">
+<script src="{% static 'js/admin-ui.js' %}?v=20261024b" defer></script>
+{% endblock %}
+{% block bodyclass %}kairos-manager{% endblock %}
+{% block header %}{% if has_permission %}
+{% include 'admin/components/sidebar.html' %}
+<button class="km-sidebar-backdrop" type="button" aria-label="Close navigation" tabindex="-1" hidden></button>
+<header id="header" class="km-topbar">
+  <div class="km-topbar-start">
+    <button class="km-menu-button km-icon-button" type="button" aria-controls="kairos-sidebar" aria-expanded="false" aria-label="Open navigation">{% include 'admin/components/icon.html' with name='menu' %}</button>
+    <a class="km-workspace-label" href="{% url 'admin:index' %}">Store manager</a><span class="km-slash">/</span><span class="km-current-page">{% if admin_overview_active %}Overview{% elif opts %}{{ opts.verbose_name_plural|capfirst }}{% else %}{{ title }}{% endif %}</span>
+  </div>
+  <div class="km-topbar-actions">
+    {% if perms.catalog.view_product %}<form class="km-global-search" action="{% url 'admin:catalog_product_changelist' %}" method="get" role="search"><label class="visually-hidden" for="km-product-search">Search products</label>{% include 'admin/components/icon.html' with name='search' %}<input id="km-product-search" name="q" type="search" placeholder="Search products…" autocomplete="off"></form>{% endif %}
+    <a class="km-store-link" href="{% url 'home' %}" target="_blank" rel="noopener">View store {% include 'admin/components/icon.html' with name='arrow' %}</a>
+    {% if perms.catalog.add_product %}<a class="km-button km-button-gold km-topbar-add" href="{% url 'admin:catalog_product_add' %}">{% include 'admin/components/icon.html' with name='plus' %}Add product</a>{% endif %}
+    <a class="km-avatar" href="{% url 'admin:password_change' %}" aria-label="Change your password">{{ user.get_username|first|upper }}</a>
+  </div>
+</header>{% endif %}{% endblock %}
+{% block nav-sidebar %}{% endblock %}
+{% block footer %}<div class="km-footer"><span>KAIROS STORE <span aria-hidden="true">·</span> Every Second, Your Style.</span><a href="{% url 'home' %}" target="_blank" rel="noopener">Open storefront ↗</a></div>{% endblock %}

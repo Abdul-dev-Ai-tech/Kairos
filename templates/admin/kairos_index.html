@@ -1,0 +1,44 @@
+{% extends 'admin/base_site.html' %}{% load static store_tags %}
+{% block bodyclass %}{{ block.super }} dashboard kairos-overview{% endblock %}
+{% block nav-breadcrumbs %}{% endblock %}{% block content_title %}{% endblock %}{% block coltype %}{% endblock %}
+{% block content %}
+<div class="km-dashboard">
+  <section class="km-page-heading">
+    <div><p class="km-eyebrow">YOUR STORE, AT A GLANCE</p><h1>Welcome back{% if user.first_name %}, {{ user.first_name|title }}{% endif %}<span class="km-gold-period">.</span></h1><p>Good time. Great business. Everything you need is right here.</p></div>
+    <div class="km-date"><span>{% include 'admin/components/icon.html' with name='calendar' %}{{ dashboard_today|date:'D, d M Y' }}</span><small>Lahore <span aria-hidden="true">·</span> PKR</small></div>
+  </section>
+  <section class="km-stats" aria-label="Store statistics">
+    {% if metrics %}
+    <article class="km-stat"><div class="km-stat-top"><span>Delivered sales</span><span class="km-stat-icon">{% include 'admin/components/icon.html' with name='chart' %}</span></div><strong>{{ metrics.sales|money }}</strong><small>Revenue from delivered orders</small></article>
+    <article class="km-stat"><div class="km-stat-top"><span>Total orders</span><span class="km-stat-icon km-stat-icon-blue">{% include 'admin/components/icon.html' with name='bag' %}</span></div><strong>{{ metrics.orders }}</strong><small><span class="km-mini-dot"></span>{{ metrics.pending }} awaiting confirmation</small></article>
+    {% endif %}
+    {% if catalog_metrics %}<article class="km-stat"><div class="km-stat-top"><span>Products</span><span class="km-stat-icon km-stat-icon-purple">{% include 'admin/components/icon.html' with name='watch' %}</span></div><strong>{{ catalog_metrics.total }}</strong><small>{{ catalog_metrics.published }} published <span aria-hidden="true">·</span> {{ catalog_metrics.drafts }} drafts</small></article>{% endif %}
+    {% if low_stock_count != None %}<article class="km-stat"><div class="km-stat-top"><span>Low-stock variants</span><span class="km-stat-icon km-stat-icon-orange">{% include 'admin/components/icon.html' with name='inventory' %}</span></div><strong>{{ low_stock_count }}</strong><small>Published variants needing attention</small></article>{% endif %}
+  </section>
+  <div class="km-overview-grid">
+    {% if metrics %}<section class="km-card km-activity">
+      <div class="km-card-heading"><div><p class="km-eyebrow">THE PAST SEVEN DAYS</p><h2>Order activity</h2></div><span class="km-soft-label">{{ week_order_count }} order{{ week_order_count|pluralize }}</span></div>
+      <div class="km-chart" role="img" aria-label="Orders received over the last seven days: {% for bar in order_activity %}{{ bar.day|date:'D d M' }}: {{ bar.count }}{% if not forloop.last %}; {% endif %}{% endfor %}">{% for bar in order_activity %}<div class="km-chart-column"><span class="km-chart-count">{{ bar.count }}</span><div class="km-chart-track"><span class="km-chart-bar{% if not bar.count %} km-chart-bar-empty{% endif %}" style="--bar-height:{{ bar.height }}%" title="{{ bar.day|date:'d M' }}: {{ bar.count }} orders"></span></div><span class="km-chart-day">{{ bar.day|date:'D' }}</span></div>{% endfor %}</div>
+      <div class="km-chart-footer"><span><i aria-hidden="true"></i>Orders received, including cancelled</span><a href="{% url 'admin:orders_order_changelist' %}">View orders ↗</a></div>
+    </section>{% endif %}
+    <section class="km-merch-card"><div class="km-merch-copy"><span class="km-eyebrow">CURATE SOMETHING EXCEPTIONAL</span><h2>Make room for<br>the next favourite.</h2><p>Your collection. Your details.<br>Ready for the storefront.</p>{% if perms.catalog.add_product %}<a class="km-button km-button-gold" href="{% url 'admin:catalog_product_add' %}">{% include 'admin/components/icon.html' with name='plus' %}Add a new product</a>{% elif perms.catalog.view_product %}<a class="km-button km-button-gold" href="{% url 'admin:catalog_product_changelist' %}">Explore products ↗</a>{% endif %}</div><img src="{% static 'images/hero.webp' %}" width="260" height="320" alt="Watch collection" class="km-merch-image"><span class="km-merch-signature" aria-hidden="true">K</span></section>
+  </div>
+  <div class="km-lower-grid">
+    {% if metrics %}<section class="km-card km-orders">
+      <div class="km-card-heading"><div><h2>Recent orders</h2><p>The latest from your customers.</p></div><a class="km-text-link" href="{% url 'admin:orders_order_changelist' %}">View all {% include 'admin/components/icon.html' with name='arrow' %}</a></div>
+      <div class="km-table-wrap"><table class="km-table"><thead><tr><th scope="col">Order</th><th scope="col">Customer</th><th scope="col">Status</th><th scope="col">Total</th><th scope="col"><span class="visually-hidden">Manage order</span></th></tr></thead><tbody>
+      {% for order in recent_orders %}<tr><td><a class="km-order-number" href="{% url 'admin:orders_order_change' order.pk %}">{{ order.number }}</a><small>{{ order.created_at|date:'d M Y, H:i' }}</small></td><td><span class="km-customer-name">{{ order.name }}</span><small>{{ order.city }}</small></td><td><span class="km-badge km-badge-{{ order.status }}">{{ order.get_status_display }}</span></td><td class="km-table-amount">{{ order.total|money }}</td><td><a class="km-table-arrow" href="{% url 'admin:orders_order_change' order.pk %}" aria-label="Manage order {{ order.number }}">{% include 'admin/components/icon.html' with name='arrow' %}</a></td></tr>
+      {% empty %}<tr><td colspan="5"><div class="km-empty-state">{% include 'admin/components/icon.html' with name='bag' %}<h3>Your first order starts here.</h3><p>New orders will appear here as customers check out.</p><a href="{% url 'home' %}">Visit the storefront ↗</a></div></td></tr>{% endfor %}
+      </tbody></table></div>
+    </section>{% endif %}
+    <div class="km-right-stack">
+      {% if low_stock_count != None %}<section class="km-card km-inventory"><div class="km-card-heading"><div><h2>Inventory watch</h2><p>A little attention goes a long way.</p></div><span class="km-inventory-dot" aria-hidden="true"></span></div>
+      <div class="km-stock-list">{% for variant in low_stock %}<a href="{% url 'admin:catalog_product_change' variant.product_id %}" class="km-stock-row"><span><strong>{{ variant.product.name }}</strong><small>{{ variant.name }} <span aria-hidden="true">·</span> {{ variant.sku }}</small></span><span class="km-badge {% if variant.stock %}km-badge-pending{% else %}km-badge-cancelled{% endif %}">{{ variant.stock }} left</span></a>{% empty %}<div class="km-inventory-clear">{% include 'admin/components/icon.html' with name='check' %}<strong>You're all stocked up.</strong><span>No published variants below your stock threshold.</span></div>{% endfor %}</div></section>{% endif %}
+      {% if metrics %}<section class="km-card km-next-steps"><h2>On your radar</h2><a href="{% url 'admin:orders_order_changelist' %}?status__exact=pending"><span class="km-quick-icon">{% include 'admin/components/icon.html' with name='clock' %}</span><span>Orders to confirm<small>Review customer details</small></span><strong>{{ metrics.pending }}</strong></a><a href="{% url 'admin:orders_order_changelist' %}?payment_status__exact=awaiting_verification"><span class="km-quick-icon">{% include 'admin/components/icon.html' with name='card' %}</span><span>Bank payments to verify<small>Check received transfers</small></span><strong>{{ metrics.bank_pending }}</strong></a></section>{% endif %}
+    </div>
+  </div>
+  {% if catalog_metrics %}<section class="km-card km-latest-products"><div class="km-card-heading"><div><h2>Your latest additions</h2><p>Keep every detail ready for its next owner.</p></div><a class="km-text-link" href="{% url 'admin:catalog_product_changelist' %}">Manage products {% include 'admin/components/icon.html' with name='arrow' %}</a></div>
+    <div class="km-product-grid">{% for product in recent_products %}<a class="km-mini-product" href="{% url 'admin:catalog_product_change' product.pk %}"><span class="km-mini-photo">{% with cover=product.cover %}<img src="{% if cover %}{% if cover.thumbnail %}{{ cover.thumbnail.url }}{% else %}{{ cover.image.url }}{% endif %}{% else %}{% static 'images/product-placeholder.svg' %}{% endif %}" width="130" height="140" alt="" loading="lazy">{% endwith %}</span><span class="km-mini-details"><span class="km-badge km-badge-{{ product.status }}">{{ product.get_status_display }}</span><strong>{{ product.name }}</strong><small>{{ product.collection.name }}</small><span class="km-mini-price">{{ product.price|money }}<span aria-hidden="true">↗</span></span></span></a>{% empty %}<div class="km-empty-state"><h3>Your collection is waiting.</h3><p>Add your first product using the button at the top.</p></div>{% endfor %}</div>
+  </section>{% endif %}
+</div>
+{% endblock %}

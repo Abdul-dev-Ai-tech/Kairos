@@ -1,0 +1,6 @@
+from django.shortcuts import redirect
+from django.utils.http import url_has_allowed_host_and_scheme
+
+def safe_redirect(request, fallback='/'):
+    target = request.POST.get('next', '')
+    return redirect(target if url_has_allowed_host_and_scheme(target, allowed_hosts={request.get_host()}, require_https=request.is_secure()) else fallback)

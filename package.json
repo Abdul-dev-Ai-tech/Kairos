@@ -1,0 +1,14 @@
+{
+  "name": "kairos-store-assets",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "node scripts/dev.mjs",
+    "build:css": "tailwindcss -i assets/tailwind.css -o static/css/tailwind.css --minify"
+  },
+  "devDependencies": {
+    "tailwindcss": "3.4.19",
+    "@fontsource/cormorant-garamond": "5.2.8",
+    "@fontsource/manrope": "5.2.8"
+  }
+}

@@ -1,0 +1,26 @@
+{{ store.name }}
+{{ store.tagline }}
+
+Thank you, {{ order.name }}. We have received order {{ order.number }}.
+Status: {{ order.get_status_display }}
+Payment: {{ order.get_payment_status_display }}
+
+{% for item in order.items.all %}{{ item.product_name }} / {{ item.variant_name }} / {{ item.sku }}
+{{ item.quantity }} × PKR {{ item.unit_price }} = PKR {{ item.line_total }}
+{% endfor %}
+Subtotal: PKR {{ order.subtotal }}
+Discount: PKR {{ order.discount }}
+Shipping: PKR {{ order.shipping }}
+Total: PKR {{ order.total }}
+
+Delivery: {{ order.name }}, {{ order.address }}, {{ order.area }}, {{ order.landmark }}, {{ order.city }} {{ order.postal_code }}, Pakistan
+Estimated delivery: {{ order.delivery_estimate }}
+{% if order.delivery_map_url %}Delivery pin: {{ order.delivery_map_url }}{% endif %}
+{% if order.payment_method == 'bank' %}
+Bank transfer: {{ order.payment_instructions }}
+Reference: {{ order.number }}
+Your order remains pending until our team verifies the payment.
+{% endif %}
+View your order: {{ order_url }}
+Guest order links expire after 7 days. Keep this link private.
+{% if store.email %}Questions? {{ store.email }}{% endif %}
